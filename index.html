@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>春节乘车变化图</title>
+    <style>::-webkit-scrollbar{display:none;}html,body{overflow:hidden;}</style>
+</head>
+<body>
+<div id="mountNode"></div>
+<script>/*Fixing iframe window.innerHeight 0 issue in Safari*/document.body.clientHeight;</script>
+<script src="https://gw.alipayobjects.com/os/antv/assets/g6/1.2.1/g6.min.js"></script>
+<script src="https://gw.alipayobjects.com/os/antv/assets/lib/jquery-3.2.1.min.js"></script>
+<script src="https://gw.alipayobjects.com/os/antv/assets/g6-plugins/1.0.1/g6-plugins.min.js"></script>
+<style>
+  .node-conatiner{
+    min-width: 200px;
+     height: 100%;  
+    border: 1px solid #999;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+  }
+  .node-conatiner-move{
+  
+    animation:mymove 5s infinite;
+    border-radius: 50%;
+  }
+  @keyframes mymove
+  {
+  0% {transform: rotateY(0deg);}
+  100% {transform: rotateY(360deg);}
+  }
+  .node-conatiner .node-conatiner-title{
+    color: white;
+    padding-left: 10px;
+    line-height: 48px;
+    font-size: 2em;
+    text-align: center;
+    /* height: 60px; */
+  }
+  .node-conatiner .node-conatiner-success{
+    background: #228ACC;
+  }
+  .node-conatiner .node-conatiner-fail{
+    background: #FF0030;
+  }
+  .node-conatiner .node-conatiner-list{
+    background: white;
+    padding-left: 10px;
+    /* height: 40px; */
+    line-height: 40px;
+  }
+  .node-conatiner .node-delete{
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    z-index: 10; /* 使得该元素z层级大于最上层canvas */
+  }
+  a{
+    position: absolute;
+    z-index: 100;
+  }
+</style>
+<script type="text/javascript">
+//'tool.minimap' 缩略图
+const plugin = new G6.Plugins['layout.dagre']( {
+  rankdir: 'LR',
+  // nodesep: 100,
+  // ranksep: 100,
+});
+const minimap = new G6.Plugins['tool.minimap']( {});
+const Util = G6.Util;
+G6.registerNode('customNode', {
+  cssSize: true, // 不使用内部 size 作为节点尺寸
+  getHtml: function(cfg){
+    const model = cfg.model;
+    const container = Util.createDOM('<div class="node-conatiner"></div>');
+    const title = Util.createDOM(`<div class="node-conatiner-title node-conatiner-${model.status}">
+      ${model.stationName}
+    </div>`);
+    container.appendChild(title);
+    if(model.trains.length>0){
+        for(let i=0;i<model.trains.length;i++){
+            const list = Util.createDOM(`<div class="node-conatiner-list ">
+                <span>车次：</span>
+            <span ><a href="https://www.baidu.com/s?wd=${model.trains[i]}" title=${model.trains[i]}  style=" position: absolute; z-index: 100;">${model.trains[i]}</a></span>
+            </div>`);
+            container.appendChild(list);
+        }
+    }
+    // const botton = Util.createDOM(`<button class="node-delete">X</button>`);
+    // botton.addEventListener('click', function(){
+    //   net.remove(net.find(model.id));
+    // });
+    // container.appendChild(botton);
+    return container;
+    }
+}, 'html');
+G6.registerNode('customNode2', {
+  cssSize: true, // 不使用内部 size 作为节点尺寸
+  getHtml: function(cfg){
+    const model = cfg.model;
+    const container = Util.createDOM('<div class="node-conatiner node-conatiner-move";"></div>');
+    const title = Util.createDOM(`<div class="node-conatiner-title node-conatiner-${model.status}">
+      ${model.stationName}
+    </div>`);
+    container.appendChild(title);
+    if(model.trains.length>0){
+        for(let i=0;i<model.trains.length;i++){
+            const list = Util.createDOM(`<div class="node-conatiner-list">
+                <span>车次：</span>
+            <span ><a href="https://www.baidu.com/s?wd=${model.trains[i]}" title=${model.trains[i]} style=" position: absolute; z-index: 100;">${model.trains[i]}</a></span>
+            </div>`);
+            container.appendChild(list);
+        }
+    }
+
+    return container;
+    }
+}, 'html');
+G6.registerNode('aboutMe', {
+  cssSize: true, // 不使用内部 size 作为节点尺寸
+  getHtml: function(cfg){
+    const model = cfg.model;
+    const container = Util.createDOM('<div class="node-conatiner ";"></div>');
+    const title = Util.createDOM(`<div class="node-conatiner-title node-conatiner-${model.status}">
+      ${model.stationName}
+    </div>`);
+    container.appendChild(title);
+    
+    const email = Util.createDOM(`<div class="node-conatiner-list">
+        <span>Email：</span>
+    <span ><a href="mailto:WULIANGCHEN511@pingan.com.cn" title="平安科技前端开发吴良辰" style=" position: absolute; z-index: 100;">平安科技前端开发</a></span>
+    </div>`);
+    container.appendChild(email);
+    const wechat = Util.createDOM(`<div class="node-conatiner-list">
+        <span>微信：</span>
+    <span ><a href="mailto:WULIANGCHEN511@pingan.com.cn" title="平安科技前端开发吴良辰" style=" position: absolute; z-index: 100;">wlc5720</a></span>
+    </div>`);
+    container.appendChild(wechat);
+    return container;
+    }
+}, 'html');
+const data = {
+  "nodes": [
+    {
+      "id": "bj",
+      "stationName": "北京西站",
+      "trains": ['K1453','Z133','Z107','K105'],
+      "status": 'fail'
+    },
+    {
+      "id": "sh",
+      "stationName": "上海站",
+      "trains": ['G7080','G7084','G7088'],
+      "status": 'success'
+    },
+    {
+      "id": "shhq",
+      "stationName": "上海虹桥站",
+      "trains": ['G7132','G7136','G7140','G7144'],
+      "status": 'success'
+    },
+    {
+      "id": "hzd",
+      "stationName": "杭州东站",
+      "trains": ['K272','T212','K470','G7330','G7588','G1372'],
+      "status": 'success'
+    },
+    {
+      "id": "aq",
+      "stationName": "安庆站",
+      "trains": ['K311','K1030','G7132','G7136','G7140','G7090'],
+      "status": 'success',
+       "shape": "customNode2"  
+    },
+    {
+      "id": "ja",
+      "stationName": "吉安站",
+      "trains": ['Z108','Z134','K572','T212','K470'],
+      "status": 'success'
+    },
+    {
+      "id": "gz",
+      "stationName": "广州站",
+      "trains": ['C7021','K9096','K237','C7111'],
+      "status": 'success'
+    },
+    {
+      "id": "am",
+      "stationName": "关于我",
+      "status": 'success',
+      "shape": "aboutMe"  
+    },
+    
+  ],
+  "edges": [
+    {
+      "source": "ja",
+      "target": "bj",
+      "id": "ja-bj",
+    },
+    {
+      "source": "bj",
+      "target": "ja",
+      "id": "bj-ja",
+    },
+    {
+      "source": "shhq",
+      "target": "sh",
+      "id": "shhq-sh",
+      'style':{lineDash: [8, 5]},
+      'label':{text:'地铁2转1'}
+    },
+    {
+      "source": "hzd",
+      "target": "shhq",
+      "id": "hzd-shhq",
+    },
+    {
+      "source": "sh",
+      "target": "aq",
+      "id": "sh-aq",
+    },
+    {
+      "source": "aq",
+      "target": "ja",
+      "id": "aq-ja",
+      "color":'red',
+      'label':{text:'吴 肖 2×K311',fill: 'green',fontSize:14}
+    },
+    {
+      "source": "hzd",
+      "target": "aq",
+      "id": "hzd-aq",
+      'style':{lineDash: [8, 5]},
+      'label':{text:'高铁修建中'}
+    },
+    {
+      "source": "ja",
+      "target": "hzd",
+      "id": "ja-hzd",
+    },
+   
+
+   
+  ]
+};
+const net = new G6.Net({
+  id: 'mountNode',
+  height: window.innerHeight,
+  fitView: 'tc',
+  // animate: true,
+  // useAnchor: false,
+  // grid: null,
+  // width: 1200,    // 画布宽
+  // height:800,    // 画布高
+  plugins: [ plugin ],
+  // mode: 'analysis'
+});
+// net.removeBehaviour(['wheelZoom', 'resizeNode']);
+net.source(data.nodes, data.edges);
+net.node()
+   .shape('customNode')
+   .style({
+    stroke: null, // 去除默认边框
+    fillOpacity: 1
+   });
+net.edge()
+    .shape('arrow')
+    .style({
+  lineWidth:3
+}).color('rgb(97, 183, 207)');
+net.render();
+// net.changeData(data.nodes, data.edges);
+</script>
+</body>
+</html>
