@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>工作流</title>
+    <style>::-webkit-scrollbar{display:none;}html,body{overflow:hidden;margin:0;}</style>
+</head>
+<body>
+<div id="mountNode"></div>
+<script>/*Fixing iframe window.innerHeight 0 issue in Safari*/document.body.clientHeight;</script>
+<script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.g6-2.1.2/build/g6.js"></script>
+<script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.g6-2.1.2/build/plugins.js"></script>
+<script>
+G6.registerNode('rect', {
+  getPath: function getPath(item) {
+    var width = 100; // 一半宽
+    var height = 40; // 一半高
+    return G6.Util.getRectPath(-width / 2, -height / 2, width, height, 10);
+  }
+});
+G6.registerEdge('flowingEdge', {
+  afterDraw: function afterDraw(item) {
+    var keyShape = item.getKeyShape();
+    keyShape.attr('lineDash', [10, 10]);
+    keyShape.attr('lineDashOffset', 0);
+    keyShape.animate({
+      lineDashOffset: -20,
+      repeat: true
+    }, 500);
+  }
+});
+var data = {
+  nodes: [{
+    id: '收集日志'
+  }, {
+    id: '入 es 集群'
+  }, {
+    id: '入 hdfs'
+  }, {
+    id: 'hive 计算'
+  }, {
+    id: 'report'
+  },{
+    id: 'report1'
+  }],
+  edges: [{
+    source: '收集日志',
+    target: '入 es 集群'
+  }, {
+    source: '收集日志',
+    target: '入 hdfs',
+    shape: 'flowingEdge',
+  }, {
+    source: '入 hdfs',
+    target: 'hive 计算'
+  }, {
+    source: '入 es 集群',
+    target: 'hive 计算'
+  }, {
+    source: 'hive 计算',
+    target: 'report'
+  }, {
+    source: 'hive 计算',
+    target: '收集日志'
+  },{
+    source: '入 es 集群',
+    target: 'report'
+  }, ]
+};
+var graph = new G6.Graph({
+  container: 'mountNode',
+  fitView: 'cc',
+  height: window.innerHeight, // 画布高
+  plugins: [new G6.Plugins['layout.dagre']()],
+  defaultIntersectBox: 'rect' // 使用矩形包围盒
+});
+
+graph.node({
+  shape: 'rect',
+  label: function label(model) {
+    return model.id;
+  },
+
+  style: {
+    stroke: '#00C0A5',
+    fill: '#92949F',
+    fillOpacity: 0.45,
+    lineWidth: 2
+  }
+});
+graph.edge({
+  style: {
+    endArrow: true
+  }
+});
+graph.read(data);
+</script>
+</body>
+</html>
