@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>工作流</title>
-    <style>::-webkit-scrollbar{display:none;}html,body{overflow:hidden;margin:0;}</style>
+    <style>::-webkit-scrollbar{display:none;}html,body{overflow:hidden;margin:0;}
+    .node{width: 100px;height:40px;border: 2px solid seagreen}</style>
 </head>
 <body>
 <div id="mountNode"></div>
@@ -13,21 +14,23 @@
 <script>
 G6.registerNode('rect', {
   getPath: function getPath(item) {
-    var width = 100; // 一半宽
-    var height = 40; // 一半高
+    var width = 200; // 一半宽
+    var height = 100; // 一半高
     return G6.Util.getRectPath(-width / 2, -height / 2, width, height, 10);
-  }
-});
-G6.registerEdge('flowingEdge', {
-  afterDraw: function afterDraw(item) {
-    var keyShape = item.getKeyShape();
-    keyShape.attr('lineDash', [10, 10]);
-    keyShape.attr('lineDashOffset', 0);
-    keyShape.animate({
-      lineDashOffset: -20,
-      repeat: true
-    }, 500);
-  }
+  },
+  draw(item){
+      const group = item.getGraphicGroup();
+      const html = G6.Util.createDOM('<div class="node">HTML 节点</div>');
+      return group.addShape('dom', {
+        attrs: {
+          x: 0,
+          y: 0,
+          width: 100,
+          height: 24,
+          html
+        }
+      });
+    }
 });
 var data = {
   nodes: [{
@@ -40,16 +43,13 @@ var data = {
     id: 'hive 计算'
   }, {
     id: 'report'
-  },{
-    id: 'report1'
   }],
   edges: [{
     source: '收集日志',
     target: '入 es 集群'
   }, {
     source: '收集日志',
-    target: '入 hdfs',
-    // shape: 'flowingEdge',
+    target: '入 hdfs'
   }, {
     source: '入 hdfs',
     target: 'hive 计算'
@@ -59,24 +59,12 @@ var data = {
   }, {
     source: 'hive 计算',
     target: 'report'
-  },
-  {
-    source: '收集日志',
-    target: 'hive 计算'
-  },
-   {
-    source: 'hive 计算',
-    target: '收集日志'
-  },
-  {
-    source: '入 es 集群',
-    target: 'report'
-  },
-   ]
+  }]
 };
 var graph = new G6.Graph({
   container: 'mountNode',
   fitView: 'cc',
+  renderer: 'svg',
   height: window.innerHeight, // 画布高
   plugins: [new G6.Plugins['layout.dagre']()],
   defaultIntersectBox: 'rect' // 使用矩形包围盒
@@ -96,7 +84,6 @@ graph.node({
   }
 });
 graph.edge({
-  shape: 'polyline-round', 
   style: {
     endArrow: true
   }

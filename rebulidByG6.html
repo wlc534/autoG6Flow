@@ -2,17 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>春节乘车变化图</title>
-    <style>::-webkit-scrollbar{display:none;}html,body{overflow:hidden;}</style>
-</head>
-<body>
-<div id="mountNode"></div>
-<script>/*Fixing iframe window.innerHeight 0 issue in Safari*/document.body.clientHeight;</script>
-<script src="https://unpkg.com/@antv/g6/build/g6.js"></script>
-<script src="https://gw.alipayobjects.com/os/antv/assets/lib/jquery-3.2.1.min.js"></script>
-<script src="https://unpkg.com/@antv/g6/build/plugins.js"></script>
-<style>
-  .node-conatiner{
+    <title>改造by G6</title>
+    <style>
+    ::-webkit-scrollbar{display:none;}html,body{overflow:hidden;margin:0;}
+    .node-conatiner{
     min-width: 200px;
     height: 100%;  
     border: 1px solid #999;
@@ -60,20 +53,45 @@
     position: absolute;
     z-index: 100;
   }
-</style>
-<script type="text/javascript">
-//'tool.minimap' 缩略图
-const plugin = new G6.Plugins['layout.dagre']( {
-  rankdir: 'LR',
-  // rankdir: 'LR',
-  nodesep: 600,
-  ranksep: 300,
-});
-const fisheyePlugin =new G6.Plugins['tool.fisheye']({'radius':200});
+    </style>
+</head>
+<body>
+<div id="mountNode"></div>
+<script>/*Fixing iframe window.innerHeight 0 issue in Safari*/document.body.clientHeight;</script>
+<script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.g6-2.1.2/build/g6.js"></script>
+<script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.g6-2.1.2/build/plugins.js"></script>
+<script>
+  const Util = G6.Util;
+G6.registerNode('rect', {
+   getPath(item) {
+    var width = 100; // 一半宽
+    var height = 40; // 一半高
+    return G6.Util.getRectPath(-width / 2, -height / 2, width, height, 10);
+  },
 
-const minimap = new G6.Plugins['tool.minimap']( {});
-const Util = G6.Util;
+  draw(item){
+      const group = item.getGraphicGroup();
+      const html = G6.Util.createDOM('<div class="node-conatiner">HTML 节点</div>');
+      return group.addShape('dom', {
+        attrs: {
+          x: 0,
+          y: 0,
+          width: 100,
+          height: 24,
+          html
+        }
+      });
+    }
+  
+  
+});
+// const Util = G6.Util;
 G6.registerNode('customNode', {
+  // getPath(item) {
+  //   var width = 100; // 一半宽
+  //   var height = 40; // 一半高
+  //   return G6.Util.getRectPath(-width / 2, -height / 2, width, height, 10);
+  // },
   draw(item){
     const group=item.getGraphicGroup();
     const model=item.getModel();
@@ -113,11 +131,11 @@ G6.registerNode('customNode', {
 
     return keyShape;
   },
-  // getPath(item) {
-  //   var width = 300; // 一半宽
-  //   var height = 160; // 一半高
-  //   return G6.Util.getRectPath(-width / 2, -height / 2, width, height, 10);
-  // }
+  getPath(item) {
+    var width = 100; // 一半宽
+    var height = 40; // 一半高
+    return G6.Util.getRectPath(-width / 2, -height / 2, width, height, 10);
+  }
   
  
 });
@@ -132,51 +150,6 @@ G6.registerEdge('flowingEdge', {
     }, 500);
   }
 });
-G6.registerNode('customNode2', {
-  cssSize: true, // 不使用内部 size 作为节点尺寸
-  getHtml: function(cfg){
-    const model = cfg.model;
-    const container = Util.createDOM('<div class="node-conatiner node-conatiner-move";"></div>');
-    const title = Util.createDOM(`<div class="node-conatiner-title node-conatiner-${model.status}">
-      ${model.stationName}
-    </div>`);
-    container.appendChild(title);
-    if(model.trains.length>0){
-        for(let i=0;i<model.trains.length;i++){
-            const list = Util.createDOM(`<div class="node-conatiner-list">
-                <span>车次：</span>
-            <span ><a href="https://www.baidu.com/s?wd=${model.trains[i]}" title=${model.trains[i]} style=" position: absolute; z-index: 100;">${model.trains[i]}</a></span>
-            </div>`);
-            container.appendChild(list);
-        }
-    }
-
-    return container;
-    }
-}, 'html');
-G6.registerNode('aboutMe', {
-  cssSize: true, // 不使用内部 size 作为节点尺寸
-  getHtml: function(cfg){
-    const model = cfg.model;
-    const container = Util.createDOM('<div class="node-conatiner ";"></div>');
-    const title = Util.createDOM(`<div class="node-conatiner-title node-conatiner-${model.status}">
-      ${model.stationName}
-    </div>`);
-    container.appendChild(title);
-    
-    const email = Util.createDOM(`<div class="node-conatiner-list">
-        <span>Email：</span>
-    <span ><a href="mailto:WULIANGCHEN511@pingan.com.cn" title="平安科技前端开发吴良辰" style=" position: absolute; z-index: 100;">平安科技前端开发</a></span>
-    </div>`);
-    container.appendChild(email);
-    const wechat = Util.createDOM(`<div class="node-conatiner-list">
-        <span>微信：</span>
-    <span ><a href="mailto:WULIANGCHEN511@pingan.com.cn" title="平安科技前端开发吴良辰" style=" position: absolute; z-index: 100;">wlc5720</a></span>
-    </div>`);
-    container.appendChild(wechat);
-    return container;
-    }
-}, 'html');
 const data = {
   "nodes": [
     {
@@ -283,48 +256,37 @@ const data = {
    
   ]
 };
-const graph = new G6.Graph({
-  id: 'mountNode',
-  renderer:'svg',
-  height: window.innerHeight,
-  // fitView: 'tc',
-  // fitView: 'cc',
-  fitView: 'autoZoom',
-  animate: true,
-  useAnchor: false,
-  // grid: null,
-  // width: 1200,    // 画布宽
-  // height:800,    // 画布高
-  plugins: [ plugin, ],
-  modes: {
-          default: ['panCanvas','panNode','wheelZoom']
-        },
-  defaultIntersectBox: 'customNode' ,// 使用矩形包围盒
-  // mode: 'analysis',
-  // useEdgeControlPoint:false
-  // mode: 'drag',
+var graph = new G6.Graph({
+  container: 'mountNode',
+  fitView: 'cc',
+  renderer: 'svg',
+  height: window.innerHeight, // 画布高
+  plugins: [new G6.Plugins['layout.dagre']({rankdir: 'LR',nodesep: 200,
+  ranksep: 100,})],
+  // defaultIntersectBox: 'customNode' // 使用矩形包围盒
 });
-// net.removeBehaviour(['wheelZoom', 'resizeNode']);
-// graph.source(data.nodes, data.edges);
-graph.node()
-   .shape('customNode')
-   .style({
-    stroke: null, // 去除默认边框
-    fillOpacity: 1
-   });
+
+graph.node({
+  // shape: 'customNode',
+  shape: 'rect',
+  label: function label(model) {
+    return model.id;
+  },
+
+  style: {
+    stroke: '#00C0A5',
+    fill: '#92949F',
+    fillOpacity: 0.45,
+    lineWidth: 2
+  }
+});
 graph.edge({
-    shape: 'polyline-round',
-    style: {
+  // shape: 'polyline-round',
+  style: {
     endArrow: true
   }
 });
-//    graph.edge()
-//     .shape('arrow')
-//     .style({
-//   lineWidth:3
-// }).color('rgb(97, 183, 207)');
 graph.read(data);
-// net.changeData(data.nodes, data.edges);
 </script>
 </body>
 </html>
